@@ -1,6 +1,6 @@
 # Project Status: Project DocuChat
 
-**Current State:** M1_IN_PROGRESS
+**Current State:** M1_IMPLEMENTED_PENDING_REVIEW
 
 **Stack Choices (Confirmed):**
 - API: Fastify + TypeScript
@@ -24,9 +24,15 @@
 - Added CI concurrency + permissions and a smoke test step that boots services and runs `npm run smoke:boot`.
 - Added smoke test script (`scripts/smoke/boot.cjs`) plus documentation updates.
 - Drafted M1 plan in `docs/M1_PLAN.md`.
+- Added dbmate config + baseline SQL migrations for tenants/users/memberships/tokens/invites.
+- Added auth env configuration + updated .env.example defaults.
+- Implemented auth API (register, verify email, login, refresh rotation, logout, forgot/reset password, invites).
+- Added CSRF double-submit cookie checks and password policy enforcement.
+- Added seed admin script (`npm run db:seed:admin`).
+- Added auth docs + expanded README/DEVELOPMENT and CI test step.
 
 **Next Step:**
-- Execute M1 plan (auth + migrations: JWT refresh cookies, internal users, dbmate migrations).
+- Run migrations and seed admin locally; verify auth flows with smoke checks.
 
 ## Approvals
 - 2026-02-15: **M0 follow-ups** — **APPROVED** (auto-approved by Lobster PM based on best practices).

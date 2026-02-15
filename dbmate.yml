@@ -1,0 +1,5 @@
+# dbmate configuration
+# Uses DATABASE_URL by default.
+# MIGRATIONS_DIR can override, but we pin it here for consistency.
+migrations_dir: db/migrations
+schema_file: db/schema.sql

@@ -1,0 +1,15 @@
+{
+  "name": "@docuchat/queue",
+  "version": "0.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint \"src/**/*.{ts,tsx}\""
+  },
+  "dependencies": {
+    "bullmq": "^5.14.2",
+    "ioredis": "^5.4.2"
+  }
+}
