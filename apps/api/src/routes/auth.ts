@@ -228,7 +228,8 @@ export default async function authRoutes(server: FastifyInstance) {
     }
 
     const existingUser = await server.db.query('select id from users where email = $1', [email]);
-    if (existingUser.rowCount > 0) {
+    const existingCount = existingUser.rowCount ?? 0;
+    if (existingCount > 0) {
       return reply.status(409).send({ error: 'Email already registered' });
     }
 
@@ -599,7 +600,8 @@ export default async function authRoutes(server: FastifyInstance) {
     }
 
     const existingUser = await server.db.query('select id from users where email = $1', [email]);
-    if (existingUser.rowCount > 0) {
+    const existingCount = existingUser.rowCount ?? 0;
+    if (existingCount > 0) {
       return reply.status(409).send({ error: 'Email already registered' });
     }
 

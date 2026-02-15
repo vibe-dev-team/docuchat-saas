@@ -1,6 +1,6 @@
 # Project Status: Project DocuChat
 
-**Current State:** M1_IMPLEMENTED_PENDING_REVIEW
+**Current State:** M1_FIX_BLOCKERS_COMPLETE
 
 **Stack Choices (Confirmed):**
 - API: Fastify + TypeScript
@@ -10,6 +10,9 @@
 
 **Progress Notes:**
 - Created apps/api and apps/worker scaffolds.
+- 2026-02-15: Spawned agent to run migrations, seed admin, and smoke-check auth flows (in progress).
+- 2026-02-15: Migrations + seed OK with `sslmode=disable`. Blockers found: Fastify cookie plugin version mismatch (API won't start), TS build errors for `rowCount` possibly null, Redis port conflicts in docker-compose; auth smoke checks could not run.
+- 2026-02-15: Updated @fastify/cookie to v10, fixed `rowCount` null checks, documented `sslmode=disable` for local dbmate, made Redis port configurable in docker-compose. `npm run build` now passes; auth smoke still pending.
 - Added shared packages: config, logger, db, queue.
 - Added root tsconfig, ESLint/Prettier config, workspace setup.
 - Added .env.example and docker-compose for Postgres+pgvector, Redis, MinIO.
@@ -32,7 +35,7 @@
 - Added auth docs + expanded README/DEVELOPMENT and CI test step.
 
 **Next Step:**
-- Run migrations and seed admin locally; verify auth flows with smoke checks.
+- Patch blockers (Fastify cookie plugin mismatch + TS rowCount null checks), update local env/docs for `sslmode=disable` and Redis port conflicts, then rerun build + auth smoke checks.
 
 ## Approvals
 - 2026-02-15: **M0 follow-ups** — **APPROVED** (auto-approved by Lobster PM based on best practices).

@@ -40,6 +40,8 @@ Recommended setup:
 ## Database migrations (dbmate)
 Migrations live in `db/migrations` and are SQL-first.
 
+For local Postgres (docker compose), set `DATABASE_URL` with `?sslmode=disable` so dbmate connects without SSL.
+
 ```bash
 npm run db:migrate
 npm run db:status
@@ -59,3 +61,4 @@ The smoke test waits for Postgres/Redis, starts the worker and API on port 4010,
 ## Troubleshooting
 - **Missing env errors**: ensure `.env` exists or set `DOCUCHAT_ENV_FILE`.
 - **Services not reachable**: verify `docker compose ps` and check ports 5432 (Postgres), 6379 (Redis), 9000 (MinIO).
+- **Redis port conflicts**: set `REDIS_PORT=6380` (or another free port) in your shell or `.env` before `docker compose up`.

@@ -25,7 +25,7 @@ NODE_ENV=development
 PORT=3000
 API_LOG_LEVEL=info
 WORKER_LOG_LEVEL=info
-DATABASE_URL=postgres://docuchat:docuchat@localhost:5432/docuchat
+DATABASE_URL=postgres://docuchat:docuchat@localhost:5432/docuchat?sslmode=disable
 REDIS_URL=redis://localhost:6379
 QUEUE_NAME=docuchat-jobs
 WORKER_HEARTBEAT_MS=10000
@@ -85,6 +85,8 @@ The included `docker-compose.yml` starts:
 - Postgres (pgvector)
 - Redis
 - MinIO
+
+If Redis is already using 6379, set `REDIS_PORT=6380` (or another free port) before `docker compose up`.
 
 To stop services:
 ```bash

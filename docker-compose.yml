@@ -17,7 +17,7 @@ services:
     image: redis:7
     container_name: docuchat-redis
     ports:
-      - '6379:6379'
+      - '${REDIS_PORT:-6379}:6379'
 
   minio:
     image: minio/minio:latest
