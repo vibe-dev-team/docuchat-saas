@@ -23,9 +23,10 @@
 - NPM audit clean; Fastify already at latest 5.7.4.
 - Added CI concurrency + permissions and a smoke test step that boots services and runs `npm run smoke:boot`.
 - Added smoke test script (`scripts/smoke/boot.cjs`) plus documentation updates.
+- Drafted M1 plan in `docs/M1_PLAN.md`.
 
 **Next Step:**
-- Implement M1 auth + migrations (JWT refresh cookies, internal users, dbmate migrations).
+- Execute M1 plan (auth + migrations: JWT refresh cookies, internal users, dbmate migrations).
 
 ## Approvals
 - 2026-02-15: **M0 follow-ups** — **APPROVED** (auto-approved by Lobster PM based on best practices).
