@@ -92,6 +92,8 @@ export const env: {
   port: number;
   apiLogLevel: LogLevel;
   workerLogLevel: LogLevel;
+  apiBodyLimitBytes: number;
+  apiTrustProxy: boolean;
   databaseUrl: string;
   redisUrl: string;
   queueName: string;
@@ -123,6 +125,8 @@ export const env: {
   port: getNumber('PORT', 3000),
   apiLogLevel: getLogLevel('API_LOG_LEVEL', 'info'),
   workerLogLevel: getLogLevel('WORKER_LOG_LEVEL', 'info'),
+  apiBodyLimitBytes: getNumber('API_BODY_LIMIT_BYTES', 1048576),
+  apiTrustProxy: getString('API_TRUST_PROXY', 'false') === 'true',
   databaseUrl: getString(
     'DATABASE_URL',
     'postgres://docuchat:docuchat@localhost:5432/docuchat',

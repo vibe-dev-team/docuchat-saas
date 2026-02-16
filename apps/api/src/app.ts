@@ -5,7 +5,11 @@ import { createPool } from '@docuchat/db';
 import authRoutes from './routes/auth';
 
 export const buildServer = () => {
-  const server = Fastify({ logger: { level: env.apiLogLevel } });
+  const server = Fastify({
+    logger: { level: env.apiLogLevel },
+    bodyLimit: env.apiBodyLimitBytes,
+    trustProxy: env.apiTrustProxy
+  });
 
   const pool = createPool(env.databaseUrl);
   server.decorate('db', pool);
