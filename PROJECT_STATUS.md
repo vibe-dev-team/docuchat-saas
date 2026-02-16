@@ -1,6 +1,6 @@
 # Project Status: Project DocuChat
 
-**Current State:** M4_IN_PROGRESS
+**Current State:** M5_HARDENING_IN_PROGRESS
 
 **Stack Choices (Confirmed):**
 - API: Fastify + TypeScript
@@ -9,6 +9,10 @@
 - Object Storage: S3-compatible (MinIO)
 
 **Progress Notes:**
+- 2026-02-16 12:04 UTC: Transitioned to M5 hardening follow-up; spawned review agent to verify hardening branch status and next actions.
+- 2026-02-16 12:00 UTC: M4 closeout QA complete. `npm run build` passed; `npm run smoke:boot` passed; `npm run smoke:ingest` passed (document `c8bcb87c-8bf8-4552-8c96-ded1384d73d7` ready). `SMOKE_DOCUMENT_ID=c8bcb87c-8bf8-4552-8c96-ded1384d73d7 npm run smoke:chatbots:run` passed (chatbot CRUD + Q&A with citations).
+- 2026-02-16 11:54 UTC: Added documents/chatbots/conversations schemas + routes, registered multipart + API route prefixes, and installed @fastify/multipart. Ran `npm run build` + `npm run db:migrate`. `npm run smoke:ingest` passed (document `fcf70b22-536c-4ada-b761-51ae982a4278` ready). Started API manually and ran `SMOKE_DOCUMENT_ID=fcf70b22-536c-4ada-b761-51ae982a4278 npm run smoke:chatbots` — passed (Q&A + citations). 
+- 2026-02-16 11:48 UTC: Installed @fastify/helmet/@fastify/rate-limit/@fastify/cors (npm install). `npm run build` passed. `npm run smoke:boot` passed. `npm run smoke:ingest` failed uploading PDF: 404 POST /documents/tenants/:tenantId/upload not found (no SMOKE_DOCUMENT_ID produced). `npm run smoke:chatbots` not run due to ingest failure.
 - 2026-02-16 07:10 UTC: Created `.env.local` (copied `.env`) with `DOCUCHAT_ENV_FILE=.env.local`, `SMOKE_EMAIL=smoke.test@docuchat.local`, and updated `SMOKE_PASSWORD`. Ran `npm run db:migrate`, `npm run db:seed:admin` (already exists), and seeded smoke user. `npm run build` passed. Smoke suite: `npm run smoke:boot` passed; `npm run smoke:ingest` passed (document `0e307e25-0664-4cac-81f8-4376d0043845` ready); started API/worker manually for `npm run smoke:chatbots` (script expects API running) and chatbots Q&A passed.
 - 2026-02-16 05:54 UTC: Checked env/`.env`/`.env.local` + shell env for `SMOKE_EMAIL`/`SMOKE_PASSWORD`/`DOCUCHAT_ENV_FILE`; none set (no env dir or `.env.local`, env empty). Smoke suite not run; credentials still missing.
 - 2026-02-16 05:49 UTC: Checked env/`.env`/`.env.local` for `SMOKE_EMAIL`/`SMOKE_PASSWORD`/`DOCUCHAT_ENV_FILE`; none set (no env dir or `.env.local`). Smoke suite not run; credentials still missing.
@@ -93,9 +97,11 @@
 - 2026-02-15: Reran `npm run smoke:chatbots` with OpenAI Q&A enabled (no `SMOKE_SKIP_QA`). Started API + worker via `npm run dev` in `apps/api` and `apps/worker`. Env: `OPENAI_API_KEY` set in shell, `SMOKE_EMAIL=admin@example.com`, `SMOKE_PASSWORD=ChangeMe12345!`, `SMOKE_DOCUMENT_ID=98a2f84c-b1f2-40ad-9d08-0515c0e514ac`, Redis on `redis://localhost:6380`, Postgres `sslmode=disable`, MinIO `http://localhost:9002` bucket `docuchat`. Smoke passed with 1 citation returned.
 
 **Next Step:**
-- M3 smoke/QA complete with real OpenAI key; proceed to M4 planning/review or production hardening.
+- M5 hardening review in progress; confirm branch status and decide merge/QA plan.
 
 **Coordination Log:**
+- 2026-02-16: Orchestrator spawned M5 hardening review agent (label: docuchat-m5-hardening-review) to verify branch status and next steps.
+- 2026-02-16: Orchestrator spawned M5 hardening QA/cleanup agent (label: docuchat-m5-hardening-qa-cleanup) to clean working tree, run build/smoke suite, and report merge readiness.
 - 2026-02-16: Orchestrator spawning M4 smoke-suite rerun agent to recheck SMOKE credentials and run chatbots/ingest if available.
 - 2026-02-16: Orchestrator spawned M4 smoke-suite rerun agent (label: docuchat-m4-smoke-suite-rerun-14) to check SMOKE creds and run chatbots/ingest if available.
 - 2026-02-16: Orchestrator spawning M4 CORS/build-fix agent to add Fastify CORS (credentials + x-csrf-token) and rerun build/smoke after npm install.
@@ -156,3 +162,8 @@
 
 [2026-02-16 06:34:40 UTC] DocuChat M4 smoke rerun: skipped (missing SMOKE_EMAIL/SMOKE_PASSWORD/DOCUCHAT_ENV_FILE in env; no .env.local).
 [2026-02-16 06:39:46 UTC] DocuChat M4 smoke rerun: skipped (missing SMOKE_EMAIL/SMOKE_PASSWORD/DOCUCHAT_ENV_FILE in env/.env; no .env.local).
+
+[2026-02-16 11:34 UTC] M4 smoke rerun: found SMOKE_EMAIL/SMOKE_PASSWORD and DOCUCHAT_ENV_FILE in .env.local. `npm run build` failed in @docuchat/api with TS errors in `src/app.ts` (line 21 invalid characters). `npm run smoke:chatbots` failed: missing `SMOKE_DOCUMENT_ID` (set `SMOKE_SKIP_QA=true` to skip Q&A). `npm run smoke:ingest` failed when starting API: SyntaxError in `apps/api/dist/app.js` at `devOriginMatchers` (Unexpected token ','); smoke run aborted after API exit.
+- 2026-02-16: Orchestrator spawned M4 build+smoke-fix agent (label: docuchat-m4-build-smoke-fix) to fix devOriginMatchers, install missing Fastify deps, and rerun build/smoke.
+- 2026-02-16: M4 build/smoke-fix run: installed @fastify/helmet/@fastify/rate-limit/@fastify/cors; build + smoke:boot passed; smoke:ingest failed 404 on POST /documents/tenants/:tenantId/upload (no SMOKE_DOCUMENT_ID); smoke:chatbots not run.
+- 2026-02-16: Orchestrator spawned M4 ingest-route-fix agent (label: docuchat-m4-ingest-route-fix) to resolve smoke:ingest 404 and rerun build/smoke.

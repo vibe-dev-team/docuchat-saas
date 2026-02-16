@@ -3,10 +3,14 @@ import cookie from '@fastify/cookie';
 import cors from '@fastify/cors';
 import rateLimit from '@fastify/rate-limit';
 import helmet from '@fastify/helmet';
+import multipart from '@fastify/multipart';
 import { decodeJwt } from 'jose';
 import { env } from '@docuchat/config';
 import { createPool } from '@docuchat/db';
 import authRoutes from './routes/auth';
+import documentRoutes from './routes/documents';
+import chatbotRoutes from './routes/chatbots';
+import conversationRoutes from './routes/conversations';
 
 export const buildServer = () => {
   const server = Fastify({
@@ -18,7 +22,10 @@ export const buildServer = () => {
   const pool = createPool(env.databaseUrl);
   server.decorate('db', pool);
 
-  const devOriginMatchers = [/^http://localhost:\d+$/, /^http://127\.0\.0\.1:\d+$/];
+  const devOriginMatchers = [
+    new RegExp('^http://localhost:\\d+$'),
+    new RegExp('^http://127\\.0\\.0\\.1:\\d+$')
+  ];
   const cspAllowedOrigins = env.security.cspAllowedOrigins;
   const corsAllowedOrigins =
     env.security.corsAllowedOrigins.length > 0 ? env.security.corsAllowedOrigins : cspAllowedOrigins;
@@ -97,12 +104,18 @@ export const buildServer = () => {
     timeWindow: env.rateLimit.windowMs,
     keyGenerator: buildRateLimitKey
   });
+  server.register(multipart, {
+    limits: { fileSize: 50 * 1024 * 1024 }
+  });
 
   server.get('/health', async () => {
     return { status: 'ok' };
   });
 
   server.register(authRoutes, { prefix: '/auth' });
+  server.register(documentRoutes, { prefix: '/documents' });
+  server.register(chatbotRoutes, { prefix: '/chatbots' });
+  server.register(conversationRoutes, { prefix: '/conversations' });
 
   server.addHook('onClose', async () => {
     await pool.end();
