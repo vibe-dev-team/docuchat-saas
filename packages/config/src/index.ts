@@ -87,11 +87,24 @@ const getOptionalString = (name: string, fallback?: string) => {
   return value;
 };
 
+const getOptionalStringArray = (name: string) => {
+  const value = getOptionalString(name);
+  if (!value) {
+    return [] as string[];
+  }
+  return value
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter((entry) => entry.length > 0);
+};
+
 export const env: {
   nodeEnv: string;
   port: number;
   apiLogLevel: LogLevel;
   workerLogLevel: LogLevel;
+  apiBodyLimitBytes: number;
+  apiTrustProxy: boolean;
   databaseUrl: string;
   redisUrl: string;
   queueName: string;
@@ -118,11 +131,25 @@ export const env: {
     appBaseUrl: string;
     passwordMinLength: number;
   };
+  rateLimit: {
+    max: number;
+    windowMs: number;
+    uploadMax: number;
+    uploadWindowMs: number;
+    chatMax: number;
+    chatWindowMs: number;
+  };
+  security: {
+    cspAllowedOrigins: string[];
+    corsAllowedOrigins: string[];
+  };
 } = {
   nodeEnv: getString('NODE_ENV', 'development'),
   port: getNumber('PORT', 3000),
   apiLogLevel: getLogLevel('API_LOG_LEVEL', 'info'),
   workerLogLevel: getLogLevel('WORKER_LOG_LEVEL', 'info'),
+  apiBodyLimitBytes: getNumber('API_BODY_LIMIT_BYTES', 1048576),
+  apiTrustProxy: getString('API_TRUST_PROXY', 'false') === 'true',
   databaseUrl: getString(
     'DATABASE_URL',
     'postgres://docuchat:docuchat@localhost:5432/docuchat',
@@ -151,5 +178,17 @@ export const env: {
     secureCookies: getString('AUTH_SECURE_COOKIES', 'true') === 'true',
     appBaseUrl: getString('APP_BASE_URL', 'http://localhost:3000'),
     passwordMinLength: getNumber('AUTH_PASSWORD_MIN_LENGTH', 12)
+  },
+  rateLimit: {
+    max: getNumber('API_RATE_LIMIT_MAX', 300),
+    windowMs: getNumber('API_RATE_LIMIT_WINDOW_MS', 60000),
+    uploadMax: getNumber('API_RATE_LIMIT_UPLOAD_MAX', 20),
+    uploadWindowMs: getNumber('API_RATE_LIMIT_UPLOAD_WINDOW_MS', 60000),
+    chatMax: getNumber('API_RATE_LIMIT_CHAT_MAX', 30),
+    chatWindowMs: getNumber('API_RATE_LIMIT_CHAT_WINDOW_MS', 60000)
+  },
+  security: {
+    cspAllowedOrigins: getOptionalStringArray('API_CSP_ALLOWLIST'),
+    corsAllowedOrigins: getOptionalStringArray('API_CORS_ALLOWLIST')
   }
 };

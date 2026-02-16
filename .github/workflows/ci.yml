@@ -38,9 +38,12 @@ jobs:
         run: npm run test
 
       - name: Start local services
-        run: docker compose up -d
+        run: docker compose up -d --wait --wait-timeout 60
 
       - name: Smoke test API + worker boot
+        env:
+          AUTH_ACCESS_TOKEN_SECRET: ci-test-secret
+          AUTH_REFRESH_TOKEN_SECRET: ci-refresh-secret
         run: npm run smoke:boot
 
       - name: Stop local services
