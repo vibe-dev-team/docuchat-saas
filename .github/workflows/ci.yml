@@ -41,6 +41,8 @@ jobs:
         run: docker compose up -d
 
       - name: Smoke test API + worker boot
+        env:
+          AUTH_ACCESS_TOKEN_SECRET: ci-test-secret
         run: npm run smoke:boot
 
       - name: Stop local services

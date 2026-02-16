@@ -1,6 +1,6 @@
 # Project Status: Project DocuChat
 
-**Current State:** M5_HARDENING_IN_PROGRESS
+**Current State:** M5_PR_OPEN
 
 **Stack Choices (Confirmed):**
 - API: Fastify + TypeScript
@@ -9,6 +9,10 @@
 - Object Storage: S3-compatible (MinIO)
 
 **Progress Notes:**
+- 2026-02-16 12:58 UTC: Added `AUTH_ACCESS_TOKEN_SECRET` env to CI smoke boot step in `.github/workflows/ci.yml` (ci-test-secret) to unblock PR #1 smoke boot; pending push/CI rerun.
+- 2026-02-16 12:49 UTC: PR #1 CI still **FAIL** after lint-fix push; mergeable_state UNSTABLE. `build` job fails during smoke boot: `Error: Missing required env: AUTH_ACCESS_TOKEN_SECRET` (API/worker exit; /health timeout). Action: add AUTH_ACCESS_TOKEN_SECRET to CI env or workflow defaults for smoke boot.
+- 2026-02-16 12:30 UTC: PR opened for M5 hardening: https://github.com/vibe-dev-team/docuchat-saas/pull/1 (branch `m5-hardening-integration` pushed; CI checks running).
+- 2026-02-16 12:35 UTC: PR #1 still open and mergeable but checks failing (mergeable_state unstable). CI “build” failed on head sha 9948fffd7ff6d54a8e51d58f5e5a85bd6b9bcab4 with TS lint warnings (Unexpected any) in api routes; needs fixes + rerun CI before merge.
 - 2026-02-16 12:04 UTC: Transitioned to M5 hardening follow-up; spawned review agent to verify hardening branch status and next actions.
 - 2026-02-16 12:00 UTC: M4 closeout QA complete. `npm run build` passed; `npm run smoke:boot` passed; `npm run smoke:ingest` passed (document `c8bcb87c-8bf8-4552-8c96-ded1384d73d7` ready). `SMOKE_DOCUMENT_ID=c8bcb87c-8bf8-4552-8c96-ded1384d73d7 npm run smoke:chatbots:run` passed (chatbot CRUD + Q&A with citations).
 - 2026-02-16 11:54 UTC: Added documents/chatbots/conversations schemas + routes, registered multipart + API route prefixes, and installed @fastify/multipart. Ran `npm run build` + `npm run db:migrate`. `npm run smoke:ingest` passed (document `fcf70b22-536c-4ada-b761-51ae982a4278` ready). Started API manually and ran `SMOKE_DOCUMENT_ID=fcf70b22-536c-4ada-b761-51ae982a4278 npm run smoke:chatbots` — passed (Q&A + citations). 
@@ -167,3 +171,6 @@
 - 2026-02-16: Orchestrator spawned M4 build+smoke-fix agent (label: docuchat-m4-build-smoke-fix) to fix devOriginMatchers, install missing Fastify deps, and rerun build/smoke.
 - 2026-02-16: M4 build/smoke-fix run: installed @fastify/helmet/@fastify/rate-limit/@fastify/cors; build + smoke:boot passed; smoke:ingest failed 404 on POST /documents/tenants/:tenantId/upload (no SMOKE_DOCUMENT_ID); smoke:chatbots not run.
 - 2026-02-16: Orchestrator spawned M4 ingest-route-fix agent (label: docuchat-m4-ingest-route-fix) to resolve smoke:ingest 404 and rerun build/smoke.
+- 2026-02-16: Orchestrator spawned M5 CI-lint-fix agent (label: docuchat-m5-ci-lint-fix) to address TS lint warnings in API routes and rerun CI for PR #1.
+- 2026-02-16: Orchestrator spawned M5 CI-lint-apply agent (label: docuchat-m5-ci-lint-apply) to apply lint fixes on m5-hardening-integration, commit, and push.
+- 2026-02-16: M5 CI-lint-apply completed: removed explicit `any` in auth routes, committed `fix(api): remove explicit any in auth routes`, pushed to origin. PROJECT_STATUS.md left modified in worktree.
