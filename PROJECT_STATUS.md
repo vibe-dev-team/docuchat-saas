@@ -9,6 +9,11 @@
 - Object Storage: S3-compatible (MinIO)
 
 **Progress Notes:**
+- 2026-02-16 13:49 UTC: Added Postgres healthcheck (pg_isready) to docker-compose and updated CI to `docker compose up -d --wait --wait-timeout 60` so smoke boot waits for DB readiness; committed on `m5-hardening-integration`. CI rerun needed to confirm fix.
+- 2026-02-16 13:19 UTC: PR #1 CI still **FAIL** on head `9ddfa49` (m5-hardening-integration). Workflow `CI` completed failure; build job failed at step **Smoke test API + worker boot**. Error: `Database connection failed Error: Connection terminated unexpectedly` → API exited, then `/health` timeout (`Error: API /health did not respond in time`). Runs: https://github.com/vibe-dev-team/docuchat-saas/actions/runs/22064221261 (job https://github.com/vibe-dev-team/docuchat-saas/actions/runs/22064221261/job/63751768897) and push run https://github.com/vibe-dev-team/docuchat-saas/actions/runs/22064219703. Merge not ready; investigate CI Postgres readiness/connection failure in smoke boot.
+- 2026-02-16 13:14 UTC: Added `AUTH_REFRESH_TOKEN_SECRET` to CI smoke boot env (alongside `AUTH_ACCESS_TOKEN_SECRET`) on `m5-hardening-integration`; pushed fix, CI rerun pending.
+- 2026-02-16 13:09 UTC: PR #1 CI still failing after latest commits; smoke boot fails with `Missing required env: AUTH_REFRESH_TOKEN_SECRET` (API/worker exit; /health timeout). Action: add AUTH_REFRESH_TOKEN_SECRET to CI env (alongside AUTH_ACCESS_TOKEN_SECRET) and rerun CI.
+- 2026-02-16 13:04 UTC: PR #1 CI still failing after latest commits (lint fix + AUTH_ACCESS_TOKEN_SECRET). mergeable_state UNSTABLE (mergeable: MERGEABLE). Two CI “build” check runs failing (CI workflow). Latest head sha dc53a57a9b0cdd90f675bbee301ac9438a065c7f; see actions: https://github.com/vibe-dev-team/docuchat-saas/actions/runs/22063566283/job/63749570006 and https://github.com/vibe-dev-team/docuchat-saas/actions/runs/22063564829/job/63749565903.
 - 2026-02-16 12:58 UTC: Added `AUTH_ACCESS_TOKEN_SECRET` env to CI smoke boot step in `.github/workflows/ci.yml` (ci-test-secret) to unblock PR #1 smoke boot; pending push/CI rerun.
 - 2026-02-16 12:49 UTC: PR #1 CI still **FAIL** after lint-fix push; mergeable_state UNSTABLE. `build` job fails during smoke boot: `Error: Missing required env: AUTH_ACCESS_TOKEN_SECRET` (API/worker exit; /health timeout). Action: add AUTH_ACCESS_TOKEN_SECRET to CI env or workflow defaults for smoke boot.
 - 2026-02-16 12:30 UTC: PR opened for M5 hardening: https://github.com/vibe-dev-team/docuchat-saas/pull/1 (branch `m5-hardening-integration` pushed; CI checks running).
@@ -106,6 +111,7 @@
 **Coordination Log:**
 - 2026-02-16: Orchestrator spawned M5 hardening review agent (label: docuchat-m5-hardening-review) to verify branch status and next steps.
 - 2026-02-16: Orchestrator spawned M5 hardening QA/cleanup agent (label: docuchat-m5-hardening-qa-cleanup) to clean working tree, run build/smoke suite, and report merge readiness.
+- 2026-02-16: Orchestrator spawned M5 CI DB-connection fix agent (label: docuchat-m5-ci-db-connection-fix) to inspect CI smoke boot failure (Postgres readiness/connection termination) and propose fix.
 - 2026-02-16: Orchestrator spawning M4 smoke-suite rerun agent to recheck SMOKE credentials and run chatbots/ingest if available.
 - 2026-02-16: Orchestrator spawned M4 smoke-suite rerun agent (label: docuchat-m4-smoke-suite-rerun-14) to check SMOKE creds and run chatbots/ingest if available.
 - 2026-02-16: Orchestrator spawning M4 CORS/build-fix agent to add Fastify CORS (credentials + x-csrf-token) and rerun build/smoke after npm install.
