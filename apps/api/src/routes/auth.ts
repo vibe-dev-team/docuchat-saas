@@ -1,4 +1,4 @@
-import { FastifyInstance } from 'fastify';
+import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { z } from 'zod';
 import { env } from '@docuchat/config';
 import { generateToken, hashTokenWithSecret } from '../lib/crypto';
@@ -24,7 +24,7 @@ const slugify = (value: string) => {
 };
 
 const setAuthCookies = (
-  reply: any,
+  reply: FastifyReply,
   accessToken: string,
   refreshToken: string,
   csrfToken: string,
@@ -55,7 +55,7 @@ const setAuthCookies = (
   });
 };
 
-const clearAuthCookies = (reply: any) => {
+const clearAuthCookies = (reply: FastifyReply) => {
   const baseOptions = {
     path: '/',
     secure: env.auth.secureCookies,
@@ -68,7 +68,7 @@ const clearAuthCookies = (reply: any) => {
   reply.clearCookie(env.auth.csrfCookieName, baseOptions);
 };
 
-const requireCsrf = (request: any, reply: any) => {
+const requireCsrf = (request: FastifyRequest, reply: FastifyReply) => {
   const csrfCookie = request.cookies[env.auth.csrfCookieName];
   const csrfHeader = request.headers['x-csrf-token'];
   if (!csrfCookie || !csrfHeader || csrfCookie !== csrfHeader) {
@@ -152,7 +152,12 @@ const revokeUserRefreshTokens = async (server: FastifyInstance, userId: string, 
   );
 };
 
-const issueSession = async (server: FastifyInstance, user: { id: string; tenantId: string; role: string }, request: any, reply: any) => {
+const issueSession = async (
+  server: FastifyInstance,
+  user: { id: string; tenantId: string; role: string },
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
   const accessToken = await signAccessToken({
     sub: user.id,
     tid: user.tenantId,
@@ -284,8 +289,9 @@ export default async function authRoutes(server: FastifyInstance) {
             );
             tenantId = tenantResult.rows[0].id;
             break;
-          } catch (err: any) {
-            if (err?.code === '23505') {
+          } catch (err: unknown) {
+            const error = err as { code?: string };
+            if (error.code === '23505') {
               slug = `${slug}-${Math.floor(Math.random() * 1000)}`;
             } else {
               throw err;
