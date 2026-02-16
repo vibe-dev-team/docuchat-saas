@@ -11,10 +11,14 @@
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md,json,yml,yaml}\"",
     "smoke:boot": "node scripts/smoke/boot.cjs",
+    "smoke:chatbots": "node scripts/smoke/chatbots.cjs",
+    "smoke:chatbots:run": "node scripts/smoke/run-chatbots.cjs",
+    "smoke:ingest": "node scripts/smoke/ingest.cjs",
     "db:status": "dbmate status",
     "db:migrate": "dbmate up",
     "db:rollback": "node scripts/dbmate-guard.cjs down",
     "db:seed:admin": "tsx scripts/seed/admin.ts",
+    "db:seed:smoke": "tsx scripts/seed/smoke.ts",
     "test": "turbo test"
   },
   "devDependencies": {

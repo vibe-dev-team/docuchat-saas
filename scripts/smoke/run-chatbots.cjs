@@ -4,10 +4,12 @@ require('./env.cjs');
 const { spawn } = require('node:child_process');
 const { setTimeout: delay } = require('node:timers/promises');
 const net = require('node:net');
+const path = require('node:path');
 
 const port = Number(process.env.SMOKE_PORT ?? 4010);
 const apiPath = 'apps/api/dist/index.js';
 const workerPath = 'apps/worker/dist/index.js';
+const chatbotsPath = path.join(__dirname, 'chatbots.cjs');
 
 const waitForPort = async (host, port, timeoutMs = 15000) => {
   const started = Date.now();
@@ -47,9 +49,9 @@ const waitForHealth = async (timeoutMs = 20000) => {
   throw new Error('API /health did not respond in time');
 };
 
-const spawnProcess = (label, command, args, env) => {
+const spawnProcess = (label, command, args, envOverrides) => {
   const child = spawn(command, args, {
-    env: { ...process.env, ...env },
+    env: { ...process.env, ...envOverrides },
     stdio: 'inherit',
   });
   child.on('exit', (code) => {
@@ -59,6 +61,18 @@ const spawnProcess = (label, command, args, env) => {
   });
   return child;
 };
+
+const waitForExit = (child) =>
+  new Promise((resolve, reject) => {
+    child.on('exit', (code) => {
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(new Error(`Chatbot smoke exited with code ${code}`));
+      }
+    });
+    child.on('error', reject);
+  });
 
 const main = async () => {
   console.log('Waiting for Postgres and Redis...');
@@ -80,11 +94,8 @@ const main = async () => {
 
   try {
     await waitForHealth();
-    await delay(1500);
-    if (worker.killed || worker.exitCode !== null) {
-      throw new Error('Worker exited during smoke test');
-    }
-    console.log('Smoke test passed: API responded and worker stayed up.');
+    const chatbots = spawnProcess('chatbots', 'node', [chatbotsPath]);
+    await waitForExit(chatbots);
   } finally {
     api.kill('SIGTERM');
     worker.kill('SIGTERM');
