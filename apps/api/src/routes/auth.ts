@@ -215,7 +215,12 @@ const getMembership = async (server: FastifyInstance, userId: string) => {
 };
 
 export default async function authRoutes(server: FastifyInstance) {
-  server.post('/register', async (request, reply) => {
+  const authRateLimit = {
+    max: env.rateLimit.max,
+    timeWindow: env.rateLimit.windowMs
+  };
+
+  server.post('/register', { config: { rateLimit: authRateLimit } }, async (request, reply) => {
     const parsed = registerSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(400).send({ error: parsed.error.flatten() });
@@ -353,7 +358,7 @@ export default async function authRoutes(server: FastifyInstance) {
     return reply.send({ status: 'verified' });
   });
 
-  server.post('/login', async (request, reply) => {
+  server.post('/login', { config: { rateLimit: authRateLimit } }, async (request, reply) => {
     const parsed = loginSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(400).send({ error: parsed.error.flatten() });
@@ -394,7 +399,7 @@ export default async function authRoutes(server: FastifyInstance) {
     return reply.send({ status: 'ok' });
   });
 
-  server.post('/refresh', async (request, reply) => {
+  server.post('/refresh', { config: { rateLimit: authRateLimit } }, async (request, reply) => {
     if (!requireCsrf(request, reply)) {
       return;
     }
@@ -458,7 +463,7 @@ export default async function authRoutes(server: FastifyInstance) {
     return reply.send({ status: 'ok' });
   });
 
-  server.post('/logout', async (request, reply) => {
+  server.post('/logout', { config: { rateLimit: authRateLimit } }, async (request, reply) => {
     if (!requireCsrf(request, reply)) {
       return;
     }
@@ -475,7 +480,7 @@ export default async function authRoutes(server: FastifyInstance) {
     return reply.send({ status: 'ok' });
   });
 
-  server.post('/forgot-password', async (request, reply) => {
+  server.post('/forgot-password', { config: { rateLimit: authRateLimit } }, async (request, reply) => {
     const parsed = forgotSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(400).send({ error: parsed.error.flatten() });
@@ -495,7 +500,7 @@ export default async function authRoutes(server: FastifyInstance) {
     return reply.send({ status: 'ok' });
   });
 
-  server.post('/reset-password', async (request, reply) => {
+  server.post('/reset-password', { config: { rateLimit: authRateLimit } }, async (request, reply) => {
     const parsed = resetSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(400).send({ error: parsed.error.flatten() });
